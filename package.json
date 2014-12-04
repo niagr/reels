@@ -1,0 +1,14 @@
+{
+
+    "name": "Reels",
+    "description": "movies app",
+	"main": "index.html",
+    "window": {
+        "height": 600,
+        "width": 1200,
+        "toolbar": false,
+        "frame": true
+    },
+    "node-remote": "<local>"
+
+}

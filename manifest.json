@@ -1,0 +1,19 @@
+{
+    "name": "Reels",
+    "description": "Stupid movies app",
+    "version": "0.1",
+    "app": {
+        "background": {
+            "scripts": ["background.js"]
+        }
+    },
+	"permissions": [
+		{"fileSystem": ["write", "retainEntries", "directory"]},
+		"unlimitedStorage",
+        "storage",
+		"https://api.themoviedb.org/",
+		"http://d3gtl9l2a4fn1j.cloudfront.net/",
+        "http://image.tmdb.org/"
+	],
+    "icons": { "48": "reels-48.png", "128": "reels-128.png"}
+}
