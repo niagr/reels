@@ -4,6 +4,7 @@
     "description": "movies app",
 	"main": "index.html",
     "window": {
+        "icon": "reels-48.png",
         "height": 600,
         "width": 1200,
         "toolbar": false,
