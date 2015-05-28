@@ -1,0 +1,30 @@
+{
+    "version": "1.4.1",
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "declaration": false,
+        "noImplicitAny": false,
+        "removeComments": true,
+        "noLib": false
+    },
+    "filesGlob": [
+        "./**/*.ts",
+        "!./node_modules/**/*.ts"
+    ],
+    "files": [
+        "./Controller.ts",
+        "./GUIController.ts",
+        "./Movie.ts",
+        "./MovieItem.ts",
+        "./Platform/LocalStorage.ts",
+        "./Platform/Platform.ts",
+        "./Platform/fs.ts",
+        "./SearchBox.ts",
+        "./SearchView.ts",
+        "./TMDb.ts",
+        "./Utils.ts",
+        "./defs/jquery.d.ts",
+        "./defs/node-0.11.d.ts"
+    ]
+}

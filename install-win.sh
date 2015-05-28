@@ -3,7 +3,7 @@
 # Installs Reels into C:/Program Files/Reels.
 # Run with cygwin as admin. Needs the unzip package.
 # This will not add the executable to PATH. Create a shorcut.
-# NOTICE: You might need to run dos2unix on this first.
+# NOTE: You might need to run dos2unix on this first.
 
 # Make install dir
 mkdir /cygdrive/c/Program\ Files/Reels

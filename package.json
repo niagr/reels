@@ -2,12 +2,12 @@
 
     "name": "Reels",
     "description": "movies app",
-	"main": "index.html",
+	"main": "src/index.html",
     "window": {
-        "icon": "reels-48.png",
+        "icon": "icons/reels-48.png",
         "height": 600,
         "width": 1200,
-        "toolbar": false,
+        "toolbar": true,
         "frame": true
     },
     "node-remote": "<local>"
