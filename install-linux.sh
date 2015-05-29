@@ -12,8 +12,13 @@ if [ ! -d $RUNTIME_DIR ]; then
 fi
 
 
-# Create install dir in /opt
+# Create install dir
 mkdir $INSTALL_DIR
+
+if [ ! -d $INSTALL_DIR ]; then
+    echo "Could not create install directory. Exiting."
+    exit 1
+fi
 
 # Copy required files into install dir
 cp -R -t $INSTALL_DIR icons lib src package.json
