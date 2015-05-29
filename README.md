@@ -1,6 +1,6 @@
 A simple app that lists your movies in a sexy way.
 
-Reels is built on node-webkit (now renamed to [nwjs](nwjs.io))
+Reels is built on node-webkit (now renamed to [nwjs](www.nwjs.io))
 
 NOTE: Tested with nwjs-v0.12.1
 
