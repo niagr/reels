@@ -2,17 +2,27 @@
 
 # Installs Reels in a Linux system. Run with sudo.
 
-# Create install dir in /opt
-mkdir /opt/Reels
+RUNTIME_DIR='runtime'
+INSTALL_DIR='/opt/Reels'
 
-# Copy everything except the 'bin' dir into install dir
-cp -R `ls | grep -v bin` /opt/Reels/
+
+if [ ! -d $RUNTIME_DIR ]; then
+    echo "$RUNTIME_DIR directory doesn't exist. Exiting."
+    exit 1
+fi
+
+
+# Create install dir in /opt
+mkdir $INSTALL_DIR
+
+# Copy required files into install dir
+cp -R -t $INSTALL_DIR icons lib src package.json
 
 # Copy the node-webkit binaries into the install dir
-cp -R bin/node-webkit-v0.11.2-linux-x64/* /opt/Reels
+cp -R -t $INSTALL_DIR $RUNTIME_DIR/*
 
 # Rename the 'nw' executable to 'reels'
-mv /opt/Reels/nw /opt/Reels/reels
+mv $INSTALL_DIR/nw $INSTALL_DIR/reels
 
 # Create symlink to 'reels' executable in install dir in /usr/local/bin
-ln -s /opt/Reels/reels /usr/local/bin/
+ln -s $INSTALL_DIR/reels /usr/local/bin/
