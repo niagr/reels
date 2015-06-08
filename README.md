@@ -7,3 +7,11 @@ NOTE: Tested with nwjs-v0.12.1
 # Build Instructions:
 - Download [nwjs](http://nwjs.io) for your platform.
 - Put the nwjs files in a directory called "runtime" in the  root (next to package.json) and run install script as root.
+
+# Roadmap
+- Directory organisation
+- reveiws from RT
+- subtitles from OpenSubtitles
+- Drag and drop movie folder
+- Drag and drop file transfer
+- Genres filter
