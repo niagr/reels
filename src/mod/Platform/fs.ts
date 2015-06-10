@@ -85,6 +85,11 @@ module Platform {
                 return this.full_path;
             }
 
+            public get_directory_path () : string {
+                var p = require('path');
+                return p.dirname(this.full_path);
+            }
+
 
         }
 

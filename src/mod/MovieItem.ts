@@ -1,9 +1,9 @@
 /// <reference path="./Movie.ts"/>
 
 interface IMovieItemEventHandler {
-    play (Movie): void;
-    stop (Movie): void;
-
+    play (m: MovieItem): void;
+    stop (m: MovieItem): void;
+    open_dir (m: MovieItem):void;
 }
 
 var webkitURL;
@@ -56,13 +56,18 @@ class MovieItem {
                   '<div class="controls-wrapper">' +
                       '<img class="control-button play-button" src="../icons/play-grey.png">' +
                       '<br/>' +
-                      '<img class="control-button info-button" src="../icons/help-info-grey.png"s>' +
+                      '<img class="control-button info-button" src="../icons/help-info-grey.png">' +
+                      '<br/>' +
+                      '<img class="control-button open-dir-button" src="../icons/folder.svg">' +
                   '</div>' +
                '</div>'
 
         this.$controls_box = $(html);
         this.$controls_box.find(".play-button").click(function(event) {
             evHandler.play(that);
+        });
+        this.$controls_box.find(".open-dir-button").click(function(event) {
+            evHandler.open_dir(that);
         });
 
         this.$movie_title = this.$movie_info_comtainer.children(".movie-title");

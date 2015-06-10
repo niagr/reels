@@ -205,7 +205,8 @@ class GUIController {
 
         var movie_item = new MovieItem(movie, {
             play: this.play_movie,
-            stop: this.stop_movie
+            stop: this.stop_movie,
+            open_dir: this.open_containing_directory
         });
 
         this.movie_item_list.push(movie_item);
@@ -220,6 +221,11 @@ class GUIController {
         var gui = require('nw.gui');
         gui.Shell.openItem(movie_item.movie.video_file.get_full_path());
 
+    }
+
+    private open_containing_directory (movie_item: MovieItem) {
+        var gui = require('nw.gui');
+        gui.Shell.openItem(movie_item.movie.video_file.get_directory_path());
     }
 
 

@@ -43,7 +43,7 @@ class ListView implements IListView {
         if (ListView.main == this) {
             $clone = movie_item.$item_container;
         } else {
-            $clone = movie_item.$item_container.clone();
+            $clone = movie_item.$item_container.clone(true);
 
         }
         this.movie_item_container.push(movie_item);
