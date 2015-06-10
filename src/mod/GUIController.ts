@@ -9,6 +9,11 @@
 //
 // }
 
+interface IGenre {
+    id: number;
+    name: string;
+}
+
 
 
 // This object controls the user interface
@@ -25,7 +30,7 @@ class GUIController {
     private $container: JQuery;
 
 
-    private $item_container: JQuery;
+    private main_view: ListView;
 
 
     private $content_container: JQuery;
@@ -43,14 +48,18 @@ class GUIController {
     private searchbox: SearchBox;
 
 
-    private searchview: SearchView;
+    private searchview: ListView;
 
+    private genreview: ListView;
+
+    private $genre_filter: JQuery;
 
     private current_view: string; // TODO: make this into enum
 
 
     private playing: boolean;
 
+    private genres_list : IGenre
 
     constructor (controller) {
 
@@ -62,7 +71,7 @@ class GUIController {
 
         this.$container = $('#container');
 
-        this.$item_container = $("#movie-items-wrapper");
+        this.main_view = new ListView();
 
         this.$content_container = $('#content');
 
@@ -75,7 +84,11 @@ class GUIController {
 
         this.searchbox = new SearchBox((query: string) => this.search(query));
 
-        this.searchview = new SearchView();
+        this.searchview = new ListView();
+
+        this.genreview = new ListView();
+
+        this.$genre_filter = $('#genre-list');
 
         this.current_view = 'listview';
 
@@ -103,6 +116,25 @@ class GUIController {
 
     }
 
+    private show_genre (req_genre: IGenre) {
+        this.genreview.clear();
+        if (req_genre.name == 'All') {
+            this.toggle_view('listview');
+        } else {
+            this.toggle_view('genreview');
+            this.movie_item_list.forEach((movie_item: MovieItem) => {
+                var added = false;
+                movie_item.movie.movie_info.genres.forEach((movie_genre: IGenre) => {
+                    if (added == false && req_genre.id == movie_genre.id) {
+                        this.genreview.add_item(movie_item);
+                        added = true;
+                    }
+                });
+            })
+        }
+
+    }
+
 	private init_ui () {
 
         this.$toolbar.append(this.searchbox.$main_container);
@@ -122,19 +154,29 @@ class GUIController {
             this.expand_sidebar();
         });
 
+        this.controller.genres.forEach((genre: IGenre) => {
+            var $genre_filer_item = $('<li>' + genre.name + '</li>');
+            $genre_filer_item.click((ev) => {
+                this.show_genre(genre);
+            });
+            this.$genre_filter.append($genre_filer_item);
+        });
+
 	}
 
     private toggle_view (view: string) {
 
-        this.$content_container.children().detach();
-        if (view == 'searchview') {
-            if (this.current_view != 'searchview')
-                this.current_view = view;
-                this.$content_container.append(this.searchview.$main_container);
-        } else if (view == 'listview') {
-            if (this.current_view != 'listview')
-                this.current_view = view;
-                this.$content_container.append(this.$item_container);
+        var add = (list_view: ListView) => {
+            this.current_view = view;
+            this.$content_container.append(list_view.$main_container);
+        }
+
+        switch (view) {
+            case 'listview': add(this.main_view);
+                break;
+            case 'searchview': add(this.searchview);
+                break;
+            case 'genreview': add(this.genreview);
         }
 
     }
@@ -156,7 +198,7 @@ class GUIController {
 
         this.movie_item_list.push(movie_item);
 
-        this.$item_container.append(movie_item.$item_container);
+        this.main_view.add_item(movie_item);
 
     }
 

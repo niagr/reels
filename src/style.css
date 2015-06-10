@@ -158,7 +158,7 @@ html, body {
     width:100%;
 }
 
-#movie-items-wrapper, .search-view {
+#movie-items-wrapper, .search-view, .list-view {
 	overflow:auto;
 }
 

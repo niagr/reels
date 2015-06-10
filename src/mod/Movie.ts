@@ -10,7 +10,7 @@ interface IMovieInfo {
     tagline: string;
     description: string;
     posterpath: string;
-    genres: Object;
+    genres: Object[];
     crew: Object[];
     cast: Object[];
     getDirector () : string;

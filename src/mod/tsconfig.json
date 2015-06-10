@@ -15,6 +15,7 @@
     "files": [
         "./Controller.ts",
         "./GUIController.ts",
+        "./ListView.ts",
         "./Movie.ts",
         "./MovieItem.ts",
         "./Platform/LocalStorage.ts",
