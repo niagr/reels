@@ -17,7 +17,7 @@ class Controller {
 
 		var that = this;
 
-	    this.gui_controller = new GUIController(this);
+	    // this.gui_controller = new GUIController(this);
 
 	    window.tmdb = new TMDb.TMDb("f6bfd6dfde719ce3a4c710d7258692cf");
 
@@ -39,16 +39,6 @@ class Controller {
 
 		var that = this;
 
-		// Set up filesystem object
-		if (!this.app_data_dir) {
-
-
-			Platform.fs.appDataDir(function (data_dir) {
-                that.app_data_dir = data_dir;
-                that.load_stored_movies();
-            })
-		}
-
 //         load genres list
         Platform.localStorage.get("config", function(value, error) {
 
@@ -57,7 +47,8 @@ class Controller {
             } else {
                 if (value.genres) {
                     console.log("genres list cache found.");
-                    that.config = value.genres;
+                    that.genres = value.genres;
+                    finish();
                 }
             }
 
@@ -77,6 +68,21 @@ class Controller {
             }
         });
 
+        function finish() {
+            that.gui_controller = new GUIController(that);
+
+
+            // Set up filesystem object
+    		if (!that.app_data_dir) {
+
+
+    			Platform.fs.appDataDir(function (data_dir) {
+                    that.app_data_dir = data_dir;
+                    that.load_stored_movies();
+                })
+    		}
+
+        }
 	}
 
 

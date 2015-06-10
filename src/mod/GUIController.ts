@@ -88,7 +88,9 @@ class GUIController {
 
         this.genreview = new ListView();
 
-        this.$genre_filter = $('#genre-list');
+        this.$genre_filter = $('#genres-list');
+
+        console.log(this.$genre_filter);
 
         this.current_view = 'listview';
 
@@ -98,6 +100,42 @@ class GUIController {
 
     }
 
+	private init_ui () {
+
+        this.$toolbar.append(this.searchbox.$main_container);
+
+        $("#add-button").click(() => {
+			Platform.fs.chooseEntry("directory", (entry: Platform.fs.Entry) => {
+				console.log("selected directory " + entry.get_full_path());
+				this.controller.load_new_movies_from_dir(entry);
+			}, undefined);  // TODO: Add Error handling
+		});
+
+        $("#close-button").click(function(event) {
+            window.close();
+        });
+
+        $('#expand-button').click((event) => {
+            this.expand_sidebar();
+        });
+
+        this.$content_container.append(this.main_view.$main_container);
+
+        var add_genre_filter_item = (genre: IGenre) => {
+            var $genre_filer_item = $('<li>' + genre.name + '</li>');
+            $genre_filer_item.click((ev) => {
+                this.show_genre(genre);
+                console.log("clicked" + genre.name);
+            });
+            this.$genre_filter.append($genre_filer_item);
+        }
+        add_genre_filter_item({
+            id: -1,
+            name: "All"
+        });
+        this.controller.genres.forEach(add_genre_filter_item);
+
+	}
 
     public search (query: string) {
 
@@ -135,34 +173,6 @@ class GUIController {
 
     }
 
-	private init_ui () {
-
-        this.$toolbar.append(this.searchbox.$main_container);
-
-        $("#add-button").click(() => {
-			Platform.fs.chooseEntry("directory", (entry: Platform.fs.Entry) => {
-				console.log("selected directory " + entry.get_full_path());
-				this.controller.load_new_movies_from_dir(entry);
-			}, undefined);  // TODO: Add Error handling
-		});
-
-        $("#close-button").click(function(event) {
-            window.close();
-        });
-
-        $('#expand-button').click((event) => {
-            this.expand_sidebar();
-        });
-
-        this.controller.genres.forEach((genre: IGenre) => {
-            var $genre_filer_item = $('<li>' + genre.name + '</li>');
-            $genre_filer_item.click((ev) => {
-                this.show_genre(genre);
-            });
-            this.$genre_filter.append($genre_filer_item);
-        });
-
-	}
 
     private toggle_view (view: string) {
 
@@ -170,6 +180,8 @@ class GUIController {
             this.current_view = view;
             this.$content_container.append(list_view.$main_container);
         }
+
+        this.$content_container.children().detach();
 
         switch (view) {
             case 'listview': add(this.main_view);

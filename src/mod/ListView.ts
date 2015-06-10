@@ -14,6 +14,9 @@ class ListView implements IListView {
     // List of MovieItem's added to the SearchView
     private movie_item_container: MovieItem[];
 
+    // The first listview instance. All subsequent instances will clone DOM from this
+    private static main: ListView;
+
 
     constructor () {
 
@@ -22,6 +25,10 @@ class ListView implements IListView {
         this.$main_container = $("<div class='list-view'><div>");
 
         this.movie_item_container = [];
+
+        if (!ListView.main) {
+            ListView.main = this;
+        }
 
     }
 
@@ -32,7 +39,13 @@ class ListView implements IListView {
     */
     public add_item (movie_item: MovieItem) {
 
-        var $clone: JQuery = movie_item.$item_container.clone()
+        var $clone: JQuery;
+        if (ListView.main == this) {
+            $clone = movie_item.$item_container;
+        } else {
+            $clone = movie_item.$item_container.clone();
+
+        }
         this.movie_item_container.push(movie_item);
         this.$main_container.append($clone);
 
