@@ -209,8 +209,8 @@ html, body {
 
 .controls-wrapper {
 	position:relative;
-	top:50%;
-	margin-top:-53px;
+	top:10%;
+	/*margin-top:-53px;*/
 
 }
 

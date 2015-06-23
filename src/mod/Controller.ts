@@ -289,12 +289,13 @@ class Controller {
 		}
 
         // saves the info of a movie into localstorage
-        function save_info(movie) {
+        function save_info(movie: Movie) {
 
             var entry = {
                 video_file_ID: Platform.fs.retainEntry(movie.video_file),
                 id: movie.movie_info.id,
                 title: movie.movie_info.title,
+                imdb_id: movie.movie_info.imdb_id,
                 year: movie.movie_info.year,
                 tagline: movie.movie_info.tagline,
                 description: movie.movie_info.description,
@@ -311,13 +312,13 @@ class Controller {
 
             movie.load_poster();
             var image_file_name = movie.movie_info.id.toString() + ".jpg";
-            movie.poster(function(blob) {
+            movie.poster(function(blob: Blob) {
                 that.app_data_dir.getFile(image_file_name, {create:true}, function(entry) {
                     entry.write(blob, function () {
                         console.debug("wrote image file");
                     });
                 });
-            }, err);
+            });
 
             function err(e) {
                 console.debug(e.message);
@@ -348,11 +349,12 @@ class Controller {
                     console.debug(e.message);
                 }
 
-                function onRestoreEntry(entry) {
+                function onRestoreEntry(entry: Platform.fs.FileEntry) {
 
-                    var movie = new Movie(entry);
+                    var movie: Movie = new Movie(entry);
                     movie.movie_info.id = item.id;
                     movie.movie_info.title = item.title;
+                    movie.movie_info.imdb_id = item.imdb_id;
                     movie.movie_info.year = item.year;
                     movie.movie_info.tagline = item.tagline;
                     movie.movie_info.description = item.description;

@@ -206,7 +206,8 @@ class GUIController {
         var movie_item = new MovieItem(movie, {
             play: this.play_movie,
             stop: this.stop_movie,
-            open_dir: this.open_containing_directory
+            open_dir: this.open_containing_directory,
+            open_imdb_page: this.open_imdb_page
         });
 
         this.movie_item_list.push(movie_item);
@@ -226,6 +227,12 @@ class GUIController {
     private open_containing_directory (movie_item: MovieItem) {
         var gui = require('nw.gui');
         gui.Shell.openItem(movie_item.movie.video_file.get_directory_path());
+    }
+
+    private open_imdb_page (movie_item: MovieItem) {
+        const IMDB_BASE_URL = "http://www.imdb.com/title/";
+        var gui = require('nw.gui');
+        gui.Shell.openItem( IMDB_BASE_URL + movie_item.movie.movie_info.imdb_id);
     }
 
 

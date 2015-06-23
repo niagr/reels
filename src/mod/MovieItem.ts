@@ -4,6 +4,7 @@ interface IMovieItemEventHandler {
     play (m: MovieItem): void;
     stop (m: MovieItem): void;
     open_dir (m: MovieItem):void;
+    open_imdb_page (m: MovieItem): void;
 }
 
 var webkitURL;
@@ -54,6 +55,8 @@ class MovieItem {
 
         html = '<div class="controls-box">' +
                   '<div class="controls-wrapper">' +
+                      '<img class="control-button open-imdb-page-button" src="../icons/IMDb_icon.png">' +
+                      '<br/>' +
                       '<img class="control-button play-button" src="../icons/play-grey.png">' +
                       '<br/>' +
                       '<img class="control-button info-button" src="../icons/help-info-grey.png">' +
@@ -68,6 +71,9 @@ class MovieItem {
         });
         this.$controls_box.find(".open-dir-button").click(function(event) {
             evHandler.open_dir(that);
+        });
+        this.$controls_box.find(".open-imdb-page-button").click(function(event) {
+            evHandler.open_imdb_page(that);
         });
 
         this.$movie_title = this.$movie_info_comtainer.children(".movie-title");

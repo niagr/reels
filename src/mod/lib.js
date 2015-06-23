@@ -162,6 +162,7 @@ var Controller = (function () {
                 video_file_ID: Platform.fs.retainEntry(movie.video_file),
                 id: movie.movie_info.id,
                 title: movie.movie_info.title,
+                imdb_id: movie.movie_info.imdb_id,
                 year: movie.movie_info.year,
                 tagline: movie.movie_info.tagline,
                 description: movie.movie_info.description,
@@ -183,7 +184,7 @@ var Controller = (function () {
                         console.debug("wrote image file");
                     });
                 });
-            }, err);
+            });
             function err(e) {
                 console.debug(e.message);
             }
@@ -204,6 +205,7 @@ var Controller = (function () {
                     var movie = new Movie(entry);
                     movie.movie_info.id = item.id;
                     movie.movie_info.title = item.title;
+                    movie.movie_info.imdb_id = item.imdb_id;
                     movie.movie_info.year = item.year;
                     movie.movie_info.tagline = item.tagline;
                     movie.movie_info.description = item.description;
@@ -705,6 +707,7 @@ var Movie = (function () {
         this._is_poster_loaded = false;
         this.movie_info = {
             id: 0,
+            imdb_id: '',
             title: "",
             year: 0,
             tagline: "",
@@ -766,6 +769,7 @@ var Movie = (function () {
             else {
                 _this.movie_info.title = result.title;
                 _this.movie_info.id = result.id;
+                _this.movie_info.imdb_id = result.imdb_id;
                 _this.movie_info.description = result.overview;
                 _this.movie_info.tagline = result.tagline;
                 _this.movie_info.posterpath = _this.tmdb.IMAGE_BASE_URL + "w154" + result.poster_path;
@@ -834,6 +838,8 @@ var MovieItem = (function () {
         this.$movie_info_comtainer = $(html);
         html = '<div class="controls-box">' +
             '<div class="controls-wrapper">' +
+            '<img class="control-button open-imdb-page-button" src="../icons/IMDb_icon.png">' +
+            '<br/>' +
             '<img class="control-button play-button" src="../icons/play-grey.png">' +
             '<br/>' +
             '<img class="control-button info-button" src="../icons/help-info-grey.png">' +
@@ -847,6 +853,9 @@ var MovieItem = (function () {
         });
         this.$controls_box.find(".open-dir-button").click(function (event) {
             evHandler.open_dir(that);
+        });
+        this.$controls_box.find(".open-imdb-page-button").click(function (event) {
+            evHandler.open_imdb_page(that);
         });
         this.$movie_title = this.$movie_info_comtainer.children(".movie-title");
         this.$director = this.$movie_info_comtainer.children(".director");
@@ -997,7 +1006,8 @@ var GUIController = (function () {
         var movie_item = new MovieItem(movie, {
             play: this.play_movie,
             stop: this.stop_movie,
-            open_dir: this.open_containing_directory
+            open_dir: this.open_containing_directory,
+            open_imdb_page: this.open_imdb_page
         });
         this.movie_item_list.push(movie_item);
         this.main_view.add_item(movie_item);
@@ -1010,6 +1020,11 @@ var GUIController = (function () {
     GUIController.prototype.open_containing_directory = function (movie_item) {
         var gui = require('nw.gui');
         gui.Shell.openItem(movie_item.movie.video_file.get_directory_path());
+    };
+    GUIController.prototype.open_imdb_page = function (movie_item) {
+        var IMDB_BASE_URL = "http://www.imdb.com/title/";
+        var gui = require('nw.gui');
+        gui.Shell.openItem(IMDB_BASE_URL + movie_item.movie.movie_info.imdb_id);
     };
     GUIController.prototype.stop_movie = function () {
         // TODO: Remove this dead code

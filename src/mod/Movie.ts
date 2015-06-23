@@ -6,6 +6,7 @@
 interface IMovieInfo {
     id: number;
     title: string;
+    imdb_id: string;
     year: number;
     tagline: string;
     description: string;
@@ -58,6 +59,7 @@ class Movie {
         this._is_poster_loaded = false;
         this.movie_info = {
             id: 0,
+            imdb_id: '',
     		title: "",
     		year: 0,
     		tagline: "",
@@ -137,6 +139,7 @@ class Movie {
 			} else {
 				this.movie_info.title = result.title;
                 this.movie_info.id = result.id;
+                this.movie_info.imdb_id = result.imdb_id;
                 this.movie_info.description = result.overview;
                 this.movie_info.tagline = result.tagline;
                 this.movie_info.posterpath = this.tmdb.IMAGE_BASE_URL +  "w154" + result.poster_path;
