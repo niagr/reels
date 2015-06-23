@@ -1,9 +1,10 @@
 // This object controls the general tasks except the view.
 var say;
+var global;
 var Controller = (function () {
     function Controller() {
         var that = this;
-        window.tmdb = new TMDb.TMDb("f6bfd6dfde719ce3a4c710d7258692cf");
+        global.tmdb = new TMDb.TMDb("f6bfd6dfde719ce3a4c710d7258692cf");
         this.movie_list = [];
         this.app_data_dir = undefined;
         this.config = {};
@@ -24,7 +25,7 @@ var Controller = (function () {
                 }
             }
         });
-        window.tmdb.get_genres(function (err, genres_arr) {
+        global.tmdb.get_genres(function (err, genres_arr) {
             if (!err) {
                 that.genres = genres_arr;
                 that.config.genres = genres_arr;
@@ -701,7 +702,7 @@ var Platform;
 var Movie = (function () {
     function Movie(_video_file) {
         this.video_file = _video_file;
-        this.tmdb = window.tmdb;
+        this.tmdb = global.tmdb;
         this.search_title = '';
         this.search_year = '';
         this._is_poster_loaded = false;
@@ -731,7 +732,6 @@ var Movie = (function () {
                 }
             }
         };
-        this.tmdb = window.tmdb;
         this._onPosterLoaded = [];
     }
     Movie.prototype.infer_title_and_year = function () {

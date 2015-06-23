@@ -26,9 +26,9 @@ interface IGetAndSaveInfoCallback {
     (result: boolean, movie: Movie, param: any): any;
 }
 
-declare var window;
+//declare var window;
 
-declare var Utils;
+//declare var Utils;
 
 class Movie {
 
@@ -53,7 +53,7 @@ class Movie {
     constructor (_video_file: Platform.fs.FileEntry) {
 
         this.video_file = _video_file;
-        this.tmdb = window.tmdb; //TODO: fix this leaky logic
+        this.tmdb = global.tmdb; //TODO: fix this leaky logic
         this.search_title = '';
         this.search_year = '';
         this._is_poster_loaded = false;
@@ -83,7 +83,6 @@ class Movie {
                 }
             }
         }
-        this.tmdb = window.tmdb;
         this._onPosterLoaded = [];
 
     }

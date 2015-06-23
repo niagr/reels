@@ -2,6 +2,8 @@
 
 var say;
 
+var global;
+
 class Controller {
     genres: any[];
     config: any;
@@ -19,7 +21,7 @@ class Controller {
 
 	    // this.gui_controller = new GUIController(this);
 
-	    window.tmdb = new TMDb.TMDb("f6bfd6dfde719ce3a4c710d7258692cf");
+	    global.tmdb = new TMDb.TMDb("f6bfd6dfde719ce3a4c710d7258692cf");
 
 		this.movie_list = [];
 
@@ -54,7 +56,7 @@ class Controller {
 
         });
 
-        window.tmdb.get_genres(function(err, genres_arr) {
+        global.tmdb.get_genres(function(err, genres_arr) {
             if (!err) {
                 that.genres = genres_arr;
                 that.config.genres = genres_arr;
