@@ -7,7 +7,7 @@
         "icon": "icons/reels-48.png",
         "height": 600,
         "width": 1200,
-        "toolbar": false,
+        "toolbar": true,
         "frame": true
     },
     "node-remote": "<local>"

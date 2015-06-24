@@ -55,7 +55,7 @@ class MovieItem {
 
         html = '<div class="controls-box">' +
                   '<div class="controls-wrapper">' +
-                      '<img class="control-button open-imdb-page-button" src="../icons/IMDb_icon.png">' +
+                      (_movie.movie_info.imdb_id != '' ? '<img class="control-button open-imdb-page-button" src="../icons/IMDb_icon.png">' : '')  +
                       '<br/>' +
                       '<img class="control-button play-button" src="../icons/play-grey.png">' +
                       '<br/>' +
@@ -87,8 +87,8 @@ class MovieItem {
         });
 
         this.$movie_title.text(this.movie.movie_info.title);
-        this.$director.text("Directed by " + this.movie.movie_info.getDirector());
-        this.$cast.text("Cast: " + this.movie.movie_info.get_nth_cast(0) + ", " + this.movie.movie_info.get_nth_cast(1) + ", " + this.movie.movie_info.get_nth_cast(2));
+        this.$director.text("Directed by " + this.movie.getDirector());
+        this.$cast.text("Cast: " + this.movie.get_nth_cast(0) + ", " + this.movie.get_nth_cast(1) + ", " + this.movie.get_nth_cast(2));
         this.$movie_description.text(this.movie.movie_info.description);
 
         this.$item_container.append(this.$poster);

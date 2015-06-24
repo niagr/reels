@@ -12,10 +12,8 @@ interface IMovieInfo {
     description: string;
     posterpath: string;
     genres: Object[];
-    crew: Object[];
-    cast: Object[];
-    getDirector () : string;
-    get_nth_cast (number): string;
+    crew: any[];
+    cast: any[];
 }
 
 interface IPosterCallback {
@@ -67,24 +65,28 @@ class Movie {
             posterpath: "",
             genres: [],
             cast: [],
-            crew: [],
-            getDirector: function(): string {
-                for (var iii = 0; iii < this.crew.length; iii++) {
-                    if (this.crew[iii].job == "Director") {
-                        return this.crew[iii].name;
-                    }
-                }
-            },
-            get_nth_cast: function(num: number): string {
-                for (var iii = 0; iii < this.cast.length; iii++) {
-                    if (this.cast[iii].order == num) {
-                        return this.cast[iii].name;
-                    }
-                }
-            }
+            crew: []
         }
         this._onPosterLoaded = [];
 
+    }
+
+
+    public getDirector(): string {
+        for (var iii = 0; iii < this.movie_info.crew.length; iii++) {
+            if (this.movie_info.crew[iii].job == "Director") {
+                return this.movie_info.crew[iii].name;
+            }
+        }
+    }
+
+
+    public get_nth_cast (num: number): string {
+        for (var iii = 0; iii < this.movie_info.cast.length; iii++) {
+            if (this.movie_info.cast[iii].order == num) {
+                return this.movie_info.cast[iii].name;
+            }
+        }
     }
 
 

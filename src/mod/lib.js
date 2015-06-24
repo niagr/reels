@@ -159,18 +159,9 @@ var Controller = (function () {
             that.movie_list = that.movie_list.concat(new_movie_list);
         }
         function save_info(movie) {
-            var entry = {
-                video_file_ID: Platform.fs.retainEntry(movie.video_file),
-                id: movie.movie_info.id,
-                title: movie.movie_info.title,
-                imdb_id: movie.movie_info.imdb_id,
-                year: movie.movie_info.year,
-                tagline: movie.movie_info.tagline,
-                description: movie.movie_info.description,
-                cast: movie.movie_info.cast,
-                crew: movie.movie_info.crew,
-                genres: movie.movie_info.genres
-            };
+            var entry = $.extend(movie.movie_info, {
+                video_file_ID: Platform.fs.retainEntry(movie.video_file)
+            });
             var id = entry.id.toString();
             var storage_obj = {};
             storage_obj[id] = entry;
@@ -204,15 +195,11 @@ var Controller = (function () {
                 }
                 function onRestoreEntry(entry) {
                     var movie = new Movie(entry);
-                    movie.movie_info.id = item.id;
-                    movie.movie_info.title = item.title;
-                    movie.movie_info.imdb_id = item.imdb_id;
-                    movie.movie_info.year = item.year;
-                    movie.movie_info.tagline = item.tagline;
-                    movie.movie_info.description = item.description;
-                    movie.movie_info.cast = item.cast;
-                    movie.movie_info.crew = item.crew;
-                    movie.movie_info.genres = item.genres;
+                    for (var p in movie.movie_info) {
+                        if (movie.movie_info.hasOwnProperty(p)) {
+                            movie.movie_info[p] = item[p];
+                        }
+                    }
                     that.app_data_dir.getFile(movie.movie_info.id.toString() + ".jpg", { create: false }, function (ent, error) {
                         ent.file(function (file) {
                             movie.set_poster_blob(file);
@@ -716,24 +703,24 @@ var Movie = (function () {
             posterpath: "",
             genres: [],
             cast: [],
-            crew: [],
-            getDirector: function () {
-                for (var iii = 0; iii < this.crew.length; iii++) {
-                    if (this.crew[iii].job == "Director") {
-                        return this.crew[iii].name;
-                    }
-                }
-            },
-            get_nth_cast: function (num) {
-                for (var iii = 0; iii < this.cast.length; iii++) {
-                    if (this.cast[iii].order == num) {
-                        return this.cast[iii].name;
-                    }
-                }
-            }
+            crew: []
         };
         this._onPosterLoaded = [];
     }
+    Movie.prototype.getDirector = function () {
+        for (var iii = 0; iii < this.movie_info.crew.length; iii++) {
+            if (this.movie_info.crew[iii].job == "Director") {
+                return this.movie_info.crew[iii].name;
+            }
+        }
+    };
+    Movie.prototype.get_nth_cast = function (num) {
+        for (var iii = 0; iii < this.movie_info.cast.length; iii++) {
+            if (this.movie_info.cast[iii].order == num) {
+                return this.movie_info.cast[iii].name;
+            }
+        }
+    };
     Movie.prototype.infer_title_and_year = function () {
         var basename = this.video_file.get_base_name();
         var regex = /sample/i;
@@ -838,7 +825,7 @@ var MovieItem = (function () {
         this.$movie_info_comtainer = $(html);
         html = '<div class="controls-box">' +
             '<div class="controls-wrapper">' +
-            '<img class="control-button open-imdb-page-button" src="../icons/IMDb_icon.png">' +
+            (_movie.movie_info.imdb_id != '' ? '<img class="control-button open-imdb-page-button" src="../icons/IMDb_icon.png">' : '') +
             '<br/>' +
             '<img class="control-button play-button" src="../icons/play-grey.png">' +
             '<br/>' +
@@ -866,8 +853,8 @@ var MovieItem = (function () {
             _this.$poster.attr("src", img_url);
         });
         this.$movie_title.text(this.movie.movie_info.title);
-        this.$director.text("Directed by " + this.movie.movie_info.getDirector());
-        this.$cast.text("Cast: " + this.movie.movie_info.get_nth_cast(0) + ", " + this.movie.movie_info.get_nth_cast(1) + ", " + this.movie.movie_info.get_nth_cast(2));
+        this.$director.text("Directed by " + this.movie.getDirector());
+        this.$cast.text("Cast: " + this.movie.get_nth_cast(0) + ", " + this.movie.get_nth_cast(1) + ", " + this.movie.get_nth_cast(2));
         this.$movie_description.text(this.movie.movie_info.description);
         this.$item_container.append(this.$poster);
         this.$item_container.append(this.$movie_info_comtainer);

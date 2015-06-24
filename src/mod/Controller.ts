@@ -4,6 +4,10 @@ var say;
 
 var global;
 
+interface IMovieSavedInfo extends IMovieInfo {
+    video_file_ID: string;
+}
+
 class Controller {
     genres: any[];
     config: any;
@@ -293,18 +297,9 @@ class Controller {
         // saves the info of a movie into localstorage
         function save_info(movie: Movie) {
 
-            var entry = {
-                video_file_ID: Platform.fs.retainEntry(movie.video_file),
-                id: movie.movie_info.id,
-                title: movie.movie_info.title,
-                imdb_id: movie.movie_info.imdb_id,
-                year: movie.movie_info.year,
-                tagline: movie.movie_info.tagline,
-                description: movie.movie_info.description,
-                cast: movie.movie_info.cast,
-                crew: movie.movie_info.crew,
-				genres: movie.movie_info.genres
-            };
+            var entry: IMovieSavedInfo = $.extend(movie.movie_info, {
+                    video_file_ID: Platform.fs.retainEntry(movie.video_file)
+            });
             var id = entry.id.toString();
             var storage_obj = {};
             storage_obj[id] = entry;
@@ -345,7 +340,7 @@ class Controller {
 
             var count = 0;
 
-            $.each(stored, function(key, item) {
+            $.each(stored, function(key, item: IMovieSavedInfo) {
 
                 function err(e: Error) {
                     console.debug(e.message);
@@ -354,15 +349,22 @@ class Controller {
                 function onRestoreEntry(entry: Platform.fs.FileEntry) {
 
                     var movie: Movie = new Movie(entry);
-                    movie.movie_info.id = item.id;
-                    movie.movie_info.title = item.title;
-                    movie.movie_info.imdb_id = item.imdb_id;
-                    movie.movie_info.year = item.year;
-                    movie.movie_info.tagline = item.tagline;
-                    movie.movie_info.description = item.description;
-                    movie.movie_info.cast = item.cast;
-                    movie.movie_info.crew = item.crew;
-					movie.movie_info.genres = item.genres;
+                    for (let p in movie.movie_info) {
+                        if (movie.movie_info.hasOwnProperty(p)) {
+                            movie.movie_info[p] = item[p];
+                            //console.debug("copied " + p);
+                        }
+                    }
+                    // movie.movie_info.id = item.id;
+                    // movie.movie_info.title = item.title;
+                    // movie.movie_info.imdb_id = item.imdb_id;
+                    // movie.movie_info.year = item.year;
+                    // movie.movie_info.tagline = item.tagline;
+                    // movie.movie_info.description = item.description;
+                    // movie.movie_info.cast = item.cast;
+                    // movie.movie_info.crew = item.crew;
+					// movie.movie_info.genres = item.genres;
+                    // movie.movie_info.posterpath = item.posterpath;
                     that.app_data_dir.getFile(movie.movie_info.id.toString() + ".jpg", {create: false}, function(ent: Platform.fs.FileEntry, error: Error) {
                         ent.file(function(file) {
                             movie.set_poster_blob(file);
