@@ -8,7 +8,6 @@ var Controller = (function () {
         this.movie_list = [];
         this.app_data_dir = undefined;
         this.config = {};
-        this.genres = [];
         this.init();
     }
     Controller.prototype.init = function () {
@@ -17,17 +16,14 @@ var Controller = (function () {
             if (error) {
                 console.debug("No genre list cache found: " + error.message);
             }
-            else {
-                if (value.genres) {
-                    console.log("genres list cache found.");
-                    that.genres = value.genres;
-                    finish();
-                }
+            else if (value.genres) {
+                console.log("genres list cache found.");
+                that.config.genres = value.genres;
             }
+            finish();
         });
         global.tmdb.get_genres(function (err, genres_arr) {
             if (!err) {
-                that.genres = genres_arr;
                 that.config.genres = genres_arr;
                 Platform.localStorage.setJSON({
                     config: that.config
@@ -247,37 +243,30 @@ var TMDb;
     var GENRES_URL = "http://api.themoviedb.org/3/genre/list";
     var TMDb = (function () {
         function TMDb(api_key) {
+            var _this = this;
             API_KEY = api_key;
             this.IMAGE_BASE_URL = IMAGE_BASE_URL;
-        }
-        TMDb.register = function (func) {
-            var _this = this;
-            var flush = function () {
-                _this.scheduled = false;
+            this.req_queue = [];
+            this.req_count = 0;
+            this.max_req_per_10_sec = 40;
+            setInterval(function () {
                 _this.req_count = 0;
-                while (_this.req_queue.length > 0 && _this.req_count < _this.max_req_per_10_sec) {
-                    _this.req_count++;
-                    _this.req_queue.pop()();
-                }
-                if (_this.req_queue.length > 0) {
-                    _this.scheduled = true;
-                    setTimeout(flush, 10 * 1000);
-                }
-            };
-            if (this.req_count < this.max_req_per_10_sec) {
+                _this.flush_req();
+            }, 10 * 1000);
+        }
+        TMDb.prototype.flush_req = function () {
+            while (this.req_count < this.max_req_per_10_sec && this.req_queue.length > 0) {
                 this.req_count++;
-                func();
-            }
-            else {
-                this.req_queue.push(func);
-                if (this.scheduled == false) {
-                    this.scheduled = true;
-                    setTimeout(flush, 10 * 1000);
-                }
+                this.req_queue.pop()();
+                console.debug("queued request " + this.req_count + " flushed.");
             }
         };
+        TMDb.prototype.register = function (func) {
+            this.req_queue.push(func);
+            this.flush_req();
+        };
         TMDb.prototype.search_movie = function (qry_str, cb) {
-            TMDb.register(function () {
+            this.register(function () {
                 function on_reply(resp) {
                     if (resp.results.length > 0) {
                         cb(resp.results[0]);
@@ -293,7 +282,7 @@ var TMDb;
             });
         };
         TMDb.prototype.get_movie_info = function (id, cb) {
-            TMDb.register(function () {
+            this.register(function () {
                 $.getJSON(MOVIE_INFO_URL.replace("MOVIE_ID", id.toString()), {
                     api_key: API_KEY
                 }, on_reply);
@@ -308,7 +297,7 @@ var TMDb;
             });
         };
         TMDb.prototype.get_credits = function (id, cb) {
-            TMDb.register(function () {
+            this.register(function () {
                 $.getJSON(CREDITS_URL.replace("MOVIE_ID", id.toString()), {
                     api_key: API_KEY
                 }, on_reply);
@@ -323,7 +312,7 @@ var TMDb;
             });
         };
         TMDb.prototype.get_genres = function (cb) {
-            TMDb.register(function () {
+            this.register(function () {
                 $.getJSON(GENRES_URL, {
                     api_key: API_KEY
                 }, on_reply);
@@ -339,10 +328,6 @@ var TMDb;
                 }
             });
         };
-        TMDb.req_queue = [];
-        TMDb.req_count = 0;
-        TMDb.max_req_per_10_sec = 40;
-        TMDb.scheduled = false;
         return TMDb;
     })();
     TMDb_1.TMDb = TMDb;
@@ -805,7 +790,6 @@ var Movie = (function () {
     return Movie;
 })();
 /// <reference path="./Movie.ts"/>
-var webkitURL;
 var MovieItem = (function () {
     function MovieItem(_movie, evHandler) {
         var _this = this;
@@ -898,9 +882,11 @@ var GUIController = (function () {
         this.searchview = new ListView();
         this.genreview = new ListView();
         this.$genre_filter = $('#genres-list');
+        this.genre_list = [];
         console.log(this.$genre_filter);
         this.current_view = 'listview';
         this.playing = false;
+        this.genre_all_added = false;
         this.init_ui();
     }
     GUIController.prototype.init_ui = function () {
@@ -919,35 +905,37 @@ var GUIController = (function () {
             _this.expand_sidebar();
         });
         this.$content_container.append(this.main_view.$main_container);
-        var add_genre_filter_item = function (genre) {
-            var $genre_filer_item = $('<li>' + genre.name + '</li>');
-            $genre_filer_item.click(function (ev) {
-                _this.show_genre(genre);
-                console.log("clicked" + genre.name);
-            });
-            _this.$genre_filter.append($genre_filer_item);
-        };
-        add_genre_filter_item({
-            id: -1,
-            name: "All"
-        });
-        this.controller.genres.forEach(add_genre_filter_item);
     };
-    GUIController.prototype.search = function (query) {
+    GUIController.prototype.add_genres = function (genres) {
         var _this = this;
-        this.searchview.clear();
-        if (query == '') {
-            this.toggle_view('listview');
+        if (this.genre_all_added == false) {
+            this.add_genre_filter_item({
+                id: -1,
+                name: "All"
+            });
+            this.genre_all_added = true;
         }
-        else {
-            this.toggle_view('searchview');
-            var regex = new RegExp(query, 'i');
-            this.movie_item_list.forEach(function (movie_item, index, list) {
-                if (regex.test(movie_item.movie.movie_info.title)) {
-                    _this.searchview.add_item(movie_item);
+        genres.forEach(function (genre_from_movie) {
+            var found = false;
+            _this.genre_list.forEach(function (genre_from_list) {
+                if (genre_from_movie.id === genre_from_list.id) {
+                    found = true;
                 }
             });
-        }
+            if (found === false) {
+                _this.genre_list.push(genre_from_movie);
+                _this.add_genre_filter_item(genre_from_movie);
+            }
+        });
+    };
+    GUIController.prototype.add_genre_filter_item = function (genre) {
+        var _this = this;
+        var $genre_filer_item = $('<li>' + genre.name + '</li>');
+        $genre_filer_item.click(function (ev) {
+            _this.show_genre(genre);
+            console.log("clicked" + genre.name);
+        });
+        this.$genre_filter.append($genre_filer_item);
     };
     GUIController.prototype.show_genre = function (req_genre) {
         var _this = this;
@@ -965,6 +953,22 @@ var GUIController = (function () {
                         added = true;
                     }
                 });
+            });
+        }
+    };
+    GUIController.prototype.search = function (query) {
+        var _this = this;
+        this.searchview.clear();
+        if (query == '') {
+            this.toggle_view('listview');
+        }
+        else {
+            this.toggle_view('searchview');
+            var regex = new RegExp(query, 'i');
+            this.movie_item_list.forEach(function (movie_item, index, list) {
+                if (regex.test(movie_item.movie.movie_info.title)) {
+                    _this.searchview.add_item(movie_item);
+                }
             });
         }
     };
@@ -998,6 +1002,7 @@ var GUIController = (function () {
         });
         this.movie_item_list.push(movie_item);
         this.main_view.add_item(movie_item);
+        this.add_genres(movie.movie_info.genres);
     };
     GUIController.prototype.play_movie = function (movie_item) {
         console.log("aaaaaaaaaaaaaaaaa");

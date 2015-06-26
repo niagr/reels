@@ -11,7 +11,7 @@ interface IMovieInfo {
     tagline: string;
     description: string;
     posterpath: string;
-    genres: Object[];
+    genres: IGenre[];
     crew: any[];
     cast: any[];
 }

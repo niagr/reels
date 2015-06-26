@@ -54,18 +54,23 @@ class GUIController {
 
     private $genre_filter: JQuery;
 
+    private genre_list: IGenre[];
+
     private current_view: string; // TODO: make this into enum
 
 
     private playing: boolean;
 
-    private genres_list : IGenre
+    private genre_all_added : boolean;
+
+    private genres_list : IGenre;
+
 
     constructor (controller) {
 
         var that = this;
 
-    	  this.controller = controller;
+    	this.controller = controller;
 
         this.movie_item_list = [];
 
@@ -90,11 +95,15 @@ class GUIController {
 
         this.$genre_filter = $('#genres-list');
 
+        this.genre_list = [];
+
         console.log(this.$genre_filter);
 
         this.current_view = 'listview';
 
         this.playing = false;
+
+        this.genre_all_added = false;
 
         this.init_ui();
 
@@ -121,38 +130,51 @@ class GUIController {
 
         this.$content_container.append(this.main_view.$main_container);
 
-        var add_genre_filter_item = (genre: IGenre) => {
-            var $genre_filer_item = $('<li>' + genre.name + '</li>');
-            $genre_filer_item.click((ev) => {
-                this.show_genre(genre);
-                console.log("clicked" + genre.name);
-            });
-            this.$genre_filter.append($genre_filer_item);
-        }
-        add_genre_filter_item({
-            id: -1,
-            name: "All"
-        });
-        this.controller.genres.forEach(add_genre_filter_item);
+
 
 	}
 
-    public search (query: string) {
 
-        this.searchview.clear();
-        if (query == '') {
-            this.toggle_view('listview');
-        } else {
-            this.toggle_view('searchview');
-            var regex = new RegExp(query, 'i');
-            this.movie_item_list.forEach((movie_item: MovieItem, index, list) => {
-                if (regex.test(movie_item.movie.movie_info.title)) {
-                    this.searchview.add_item(movie_item);
-                }
+    /*
+        Adds an array of genres to the list and the filter if not already present
+    */
+    private add_genres (genres: IGenre[]) {
+
+        if (this.genre_all_added == false) {
+            this.add_genre_filter_item({
+                id: -1,
+                name: "All"
             });
+            this.genre_all_added = true;
         }
 
+        genres.forEach((genre_from_movie: IGenre) => {
+            var found = false;
+            this.genre_list.forEach((genre_from_list: IGenre) => {
+                if (genre_from_movie.id === genre_from_list.id) {
+                    found = true;
+                }
+            });
+            if (found === false) {
+                this.genre_list.push(genre_from_movie);
+                this.add_genre_filter_item(genre_from_movie);
+            }
+        });
+
     }
+
+
+    private add_genre_filter_item (genre: IGenre) {
+
+        var $genre_filer_item = $('<li>' + genre.name + '</li>');
+        $genre_filer_item.click((ev) => {
+            this.show_genre(genre);
+            console.log("clicked" + genre.name);
+        });
+        this.$genre_filter.append($genre_filer_item);
+
+    }
+
 
     private show_genre (req_genre: IGenre) {
         this.genreview.clear();
@@ -169,6 +191,24 @@ class GUIController {
                     }
                 });
             })
+        }
+
+    }
+
+
+    public search (query: string) {
+
+        this.searchview.clear();
+        if (query == '') {
+            this.toggle_view('listview');
+        } else {
+            this.toggle_view('searchview');
+            var regex = new RegExp(query, 'i');
+            this.movie_item_list.forEach((movie_item: MovieItem, index, list) => {
+                if (regex.test(movie_item.movie.movie_info.title)) {
+                    this.searchview.add_item(movie_item);
+                }
+            });
         }
 
     }
@@ -213,6 +253,8 @@ class GUIController {
         this.movie_item_list.push(movie_item);
 
         this.main_view.add_item(movie_item);
+
+        this.add_genres(movie.movie_info.genres)
 
     }
 

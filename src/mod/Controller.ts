@@ -9,7 +9,7 @@ interface IMovieSavedInfo extends IMovieInfo {
 }
 
 class Controller {
-    genres: any[];
+    //genres: any[];
     config: any;
     app_data_dir: Platform.fs.DirEntry;
     movie_list: Movie[];
@@ -35,7 +35,7 @@ class Controller {
 	    // Configuration JSON object
 	    this.config = {};
 
-	    this.genres = [];
+	    //this.genres = [];
 
 		this.init();
 
@@ -50,19 +50,17 @@ class Controller {
 
             if (error) {
                     console.debug("No genre list cache found: " + error.message);
-            } else {
-                if (value.genres) {
-                    console.log("genres list cache found.");
-                    that.genres = value.genres;
-                    finish();
-                }
+            } else if (value.genres) {
+                console.log("genres list cache found.");
+                that.config.genres = value.genres;
             }
+            finish();
 
         });
 
         global.tmdb.get_genres(function(err, genres_arr) {
             if (!err) {
-                that.genres = genres_arr;
+                //that.config.genres = genres_arr;
                 that.config.genres = genres_arr;
                 Platform.localStorage.setJSON({
                     config: that.config

@@ -15,8 +15,9 @@ NOTE: Tested with nwjs-v0.12.1
 - watched button
 - rate (5 star)
 - Directory organisation
-- reveiws from RT
+- reveiws from RT (not possible because API key was refused)
 - subtitles from OpenSubtitles
 - Drag and drop movie folder
 - Drag and drop file transfer
 - Genres filter - ADDED
+- Settings panel

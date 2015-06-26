@@ -21,52 +21,46 @@ module TMDb {
 
         IMAGE_BASE_URL: string;
 
-        private static req_queue: any[] = [];
+        private req_queue: Function[];
 
-        private static req_count = 0;
+        private req_count: number;
 
-        private static max_req_per_10_sec: number = 40;
-
-        private static scheduled: boolean = false;
+        private max_req_per_10_sec: number;
 
 
         constructor (api_key: string) {
 
             API_KEY = api_key;
             this.IMAGE_BASE_URL = IMAGE_BASE_URL;
+            this.req_queue = [];
+            this.req_count = 0;
+            this.max_req_per_10_sec = 40;
+
+
+            setInterval(() => {
+                this.req_count = 0;
+                this.flush_req();
+            }, 10 * 1000);
 
 
         }
 
 
-        private static register (func) {
+        private flush_req () {
 
-            var flush = () => {
-                this.scheduled = false;
-                this.req_count = 0;
-                while (this.req_queue.length > 0 && this.req_count < this.max_req_per_10_sec) {
-                    this.req_count++;
-                    this.req_queue.pop()();
-                    //console.debug("queued request " + this.req_count + " flushed.");
-                }
-                if (this.req_queue.length > 0) {
-                    this.scheduled = true;
-                    setTimeout(flush, 10 * 1000);
-                }
-            }
-
-            if (this.req_count < this.max_req_per_10_sec) {
+            while (this.req_count < this.max_req_per_10_sec && this.req_queue.length > 0) {
                 this.req_count++;
-                func();
-                //console.debug("request " + this.req_count + " sent.");
-            } else {
-                this.req_queue.push(func);
-                //console.debug("request queued.");
-                if (this.scheduled == false) {
-                    this.scheduled = true;
-                    setTimeout(flush, 10 * 1000);
-                }
+                this.req_queue.pop()();
+                console.debug("queued request " + this.req_count + " flushed.");
             }
+
+        }
+
+
+        private register (func: Function) {
+
+            this.req_queue.push(func);
+            this.flush_req();
 
         }
 
@@ -77,7 +71,7 @@ module TMDb {
     	// or is set to the string "not found" if no hits were found.
         public search_movie (qry_str: string, cb: {(string): any}) {
 
-            TMDb.register(() => {
+            this.register(() => {
 
                 function on_reply(resp) {
 
@@ -107,7 +101,7 @@ module TMDb {
     	// else it is called with the string "not found".
     	public get_movie_info (id: number, cb: {(string): void}) {
 
-            TMDb.register(() => {
+            this.register(() => {
 
         		$.getJSON(MOVIE_INFO_URL.replace("MOVIE_ID", id.toString()), {
         			api_key: API_KEY
@@ -131,7 +125,7 @@ module TMDb {
 
         public get_credits (id: number, cb: {(string): void}) {
 
-            TMDb.register(() => {
+            this.register(() => {
 
                 $.getJSON(CREDITS_URL.replace("MOVIE_ID", id.toString()), {
         			api_key: API_KEY
@@ -163,7 +157,7 @@ module TMDb {
         */
         public get_genres (cb: {(Error?, any?)}) {
 
-            TMDb.register(() => {
+            this.register(() => {
 
                 $.getJSON(GENRES_URL, {
         			api_key: API_KEY

@@ -7,8 +7,6 @@ interface IMovieItemEventHandler {
     open_imdb_page (m: MovieItem): void;
 }
 
-var webkitURL;
-
 class MovieItem {
 
 
